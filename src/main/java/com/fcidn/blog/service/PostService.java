@@ -36,6 +36,7 @@ public class PostService {
         }
 
         updatedPost.setId(post.getId());
+        updatedPost.setCreatedAt(post.getCreatedAt());
         return postRepository.save(updatedPost);
     }
 
