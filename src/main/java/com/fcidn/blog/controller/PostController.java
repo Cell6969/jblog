@@ -6,12 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/api/posts")
 public class PostController {
     @Autowired
     PostService postService;
 
 
-    @GetMapping("/")
+    @GetMapping("")
     public Iterable<Post> getPosts() {
         return postService.getPosts();
     }
@@ -21,7 +22,7 @@ public class PostController {
         return postService.getPostBySlug(slug);
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     public Post createPost(@RequestBody Post post) {
         return postService.createPost(post);
     }
