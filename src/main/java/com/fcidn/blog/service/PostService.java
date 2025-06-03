@@ -29,6 +29,7 @@ public class PostService {
         return postRepository.save(post);
     }
 
+    // TODO: refactor code & change to slug
     public Post updatePostById(Integer id, Post updatedPost) {
         Post post = postRepository.findFirstByIdAndIsDeleted(id, false).orElse(null);
         if (post == null) {
@@ -50,6 +51,7 @@ public class PostService {
         return true;
     }
 
+    // TODO: change to slug
     public Post publishPost(Integer id) {
         Post post = postRepository.findFirstByIdAndIsDeleted(id, false).orElse(null);
         if (post == null) {
