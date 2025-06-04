@@ -1,7 +1,10 @@
 package com.fcidn.blog.service;
 
 import com.fcidn.blog.entity.Post;
+import com.fcidn.blog.mapper.PostMapper;
 import com.fcidn.blog.repository.PostRepository;
+import com.fcidn.blog.request.CreatePostRequest;
+import com.fcidn.blog.response.CreatePostResponse;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +27,12 @@ public class PostService {
         return postRepository.findFirstBySlugAndIsDeleted(slug, false).orElse(null);
     }
 
-    public Post createPost(Post post) {
+    public CreatePostResponse createPost(CreatePostRequest createPostRequest) {
+        Post post = PostMapper.INSTANCE.map(createPostRequest);
+        post.setCommentCount(0L);
         post.setCreatedAt(Instant.now().getEpochSecond());
-        return postRepository.save(post);
+        post = postRepository.save(post);
+        return PostMapper.INSTANCE.map(post);
     }
 
     // TODO: refactor code & change to slug

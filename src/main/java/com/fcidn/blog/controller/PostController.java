@@ -1,7 +1,10 @@
 package com.fcidn.blog.controller;
 
 import com.fcidn.blog.entity.Post;
+import com.fcidn.blog.request.CreatePostRequest;
+import com.fcidn.blog.response.CreatePostResponse;
 import com.fcidn.blog.service.PostService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,8 +26,8 @@ public class PostController {
     }
 
     @PostMapping("")
-    public Post createPost(@RequestBody Post post) {
-        return postService.createPost(post);
+    public CreatePostResponse createPost(@Valid  @RequestBody CreatePostRequest createPostRequest) {
+        return postService.createPost(createPostRequest);
     }
 
     @PutMapping("/{id}")
