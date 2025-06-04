@@ -32,7 +32,12 @@ public class CommentService {
     }
 
     public Comment createComment(Comment comment) {
+        Post post = postRepository.findFirstBySlugAndIsDeleted(comment.getPost().getSlug(), false).orElse(null);
+        if (post == null) {
+            return null;
+        }
         comment.setCreatedAt(Instant.now().getEpochSecond());
+        comment.getPost().setId(post.getId());
         return commentRepository.save(comment);
     }
 }
