@@ -1,5 +1,6 @@
 package com.fcidn.blog.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -21,7 +22,9 @@ public class Post {
     private boolean isDeleted;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "post", orphanRemoval = true)
+    @JsonIgnore
     private List<Comment> comments ;
+    private Long commentCount;
 
     private long createdAt;
     private long publishedAt;
