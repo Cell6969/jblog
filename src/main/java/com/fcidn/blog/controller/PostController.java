@@ -2,7 +2,9 @@ package com.fcidn.blog.controller;
 
 import com.fcidn.blog.entity.Post;
 import com.fcidn.blog.request.CreatePostRequest;
+import com.fcidn.blog.request.GetPostBySlugRequest;
 import com.fcidn.blog.response.CreatePostResponse;
+import com.fcidn.blog.response.GetPostBySlugResponse;
 import com.fcidn.blog.service.PostService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +23,7 @@ public class PostController {
     }
 
     @GetMapping("/{slug}")
-    public Post getPostBySlug(@PathVariable String slug) {
+    public GetPostBySlugResponse getPostBySlug(@Valid @PathVariable GetPostBySlugRequest slug) {
         return postService.getPostBySlug(slug);
     }
 

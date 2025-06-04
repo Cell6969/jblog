@@ -3,6 +3,7 @@ package com.fcidn.blog.mapper;
 import com.fcidn.blog.entity.Post;
 import com.fcidn.blog.request.CreatePostRequest;
 import com.fcidn.blog.response.CreatePostResponse;
+import com.fcidn.blog.response.GetPostBySlugResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -11,11 +12,17 @@ import org.mapstruct.factory.Mappers;
 public interface PostMapper {
     PostMapper INSTANCE = Mappers.getMapper(PostMapper.class);
 
-    Post map (CreatePostRequest postRequest);
+    Post mapToCreatePost (CreatePostRequest postRequest);
 
     @Mapping(source = "slug", target = "path")
     @Mapping(source = "createdAt", target = "created_at")
     @Mapping(source = "publishedAt", target = "published_at")
     @Mapping(source = "commentCount", target = "comment_count")
-    CreatePostResponse map(Post post);
+    CreatePostResponse mapToCreatePost(Post post);
+
+    @Mapping(source = "slug", target = "path")
+    @Mapping(source = "createdAt", target = "created_at")
+    @Mapping(source = "publishedAt", target = "published_at")
+    @Mapping(source = "commentCount", target = "comment_count")
+    GetPostBySlugResponse mapToGetPostBySlug(Post post);
 }
