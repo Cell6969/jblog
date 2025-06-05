@@ -2,10 +2,16 @@ package com.fcidn.blog.service;
 
 import com.fcidn.blog.entity.Comment;
 import com.fcidn.blog.entity.Post;
+import com.fcidn.blog.exception.ApiException;
+import com.fcidn.blog.mapper.CommentMapper;
 import com.fcidn.blog.repository.CommentRepository;
 import com.fcidn.blog.repository.PostRepository;
+import com.fcidn.blog.request.CreateCommentRequest;
+import com.fcidn.blog.response.CreateCommentResponse;
+import com.fcidn.blog.response.GetCommentResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,25 +34,28 @@ public class CommentService {
         return commentRepository.findByPostId(post.getId(), pageRequest).getContent();
     }
 
-    public Comment getComment(Integer id) {
-        return commentRepository.findById(id).orElse(null);
+    public GetCommentResponse getComment(Integer id) {
+        Comment comment =  commentRepository.findById(id).orElseThrow(() -> new ApiException("comment not found", HttpStatus.NOT_FOUND));
+        return CommentMapper.INSTANCE.mapToGetComment(comment);
     }
 
     @Transactional
-    public Comment createComment(Comment comment) {
-        Post post = postRepository.findFirstBySlugAndIsDeleted(comment.getPost().getSlug(), false).orElse(null);
+    public CreateCommentResponse createComment(CreateCommentRequest request) {
+        Post post = postRepository.findFirstBySlugAndIsDeleted(request.getPost().getSlug(), false).orElse(null);
         if (post == null) {
             return null;
         }
 
+        Comment comment = CommentMapper.INSTANCE.mapToCreateComment(request);
+
         // save comment
         comment.setCreatedAt(Instant.now().getEpochSecond());
         comment.getPost().setId(post.getId());
-        comment = commentRepository.save(comment);
+        commentRepository.save(comment);
 
         // update comment count
         post.setCommentCount(post.getCommentCount() + 1);
         postRepository.save(post);
-        return comment;
+        return CommentMapper.INSTANCE.mapToCreateComment(comment);
     }
 }
