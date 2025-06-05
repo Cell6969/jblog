@@ -2,6 +2,8 @@ package com.fcidn.blog.service;
 
 import com.fcidn.blog.entity.Post;
 import com.fcidn.blog.exception.ApiException;
+import com.fcidn.blog.helper.ApiResponse;
+import com.fcidn.blog.helper.ResponseHelper;
 import com.fcidn.blog.mapper.PostMapper;
 import com.fcidn.blog.repository.PostRepository;
 import com.fcidn.blog.request.CreatePostRequest;
@@ -15,6 +17,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -29,47 +32,52 @@ public class PostService {
     @Autowired
     PostMapper postMapper;
 
-    public Iterable<GetPostResponse> getPosts(Integer page, Integer limit) {
+    public ResponseEntity<ApiResponse<Iterable<GetPostResponse>>> getPosts(Integer page, Integer limit) {
         PageRequest pageRequest = PageRequest.of(page, limit);
         List<Post> posts = postRepository.findAllByIsDeleted(false, pageRequest).getContent();
-        return postMapper.mapToListPost(posts);
+        Iterable<GetPostResponse> response = postMapper.mapToListPost(posts);
+        return ResponseHelper.response(response, HttpStatus.OK, "Successfully get list post");
     }
 
-    public GetPostResponse getPostBySlug(GetPostBySlugRequest request) {
+    public ResponseEntity<ApiResponse<GetPostResponse>> getPostBySlug(GetPostBySlugRequest request) {
         Post post =  postRepository.findFirstBySlugAndIsDeleted(request.getSlug(), false)
                 .orElseThrow(() -> new ApiException("not found", HttpStatus.NOT_FOUND));
-        return postMapper.mapToGetPost(post);
+        GetPostResponse response = postMapper.mapToGetPost(post);
+        return ResponseHelper.response(response, HttpStatus.OK, "Successfully get post");
     }
 
-    public CreatePostResponse createPost(CreatePostRequest createPostRequest) {
+    public ResponseEntity<ApiResponse<CreatePostResponse>> createPost(CreatePostRequest createPostRequest) {
         Post post = postMapper.mapToCreatePost(createPostRequest);
         post.setCommentCount(0L);
         post.setCreatedAt(Instant.now().getEpochSecond());
         post = postRepository.save(post);
-        return postMapper.mapToCreatePost(post);
+        CreatePostResponse response =  postMapper.mapToCreatePost(post);
+        return ResponseHelper.response(response, HttpStatus.CREATED, "Successfully create post");
     }
 
-    public UpdatePostResponse updatePostById(Integer id, UpdatePostRequest request) {
+    public ResponseEntity<ApiResponse<UpdatePostResponse>> updatePostById(Integer id, UpdatePostRequest request) {
         Post post = postRepository
                 .findFirstByIdAndIsDeleted(id, false)
                 .orElseThrow(() -> new ApiException("post not found", HttpStatus.NOT_FOUND));
         postMapper.updatePost(request, post);
         Post updatedPost = postRepository.save(post);
-        return postMapper.mapToUpdatePost(updatedPost);
+        UpdatePostResponse response =  postMapper.mapToUpdatePost(updatedPost);
+        return ResponseHelper.response(response, HttpStatus.OK, "Successfully updated post");
     }
 
-    public Boolean deletePostById(Integer id) {
+    public ResponseEntity<ApiResponse<Boolean>> deletePostById(Integer id) {
         Post post = postRepository.findById(id).orElseThrow(() -> new ApiException("post not found", HttpStatus.NOT_FOUND));
         post.setDeleted(true);
         postRepository.save(post);
-        return true;
+        return ResponseHelper.response(true,HttpStatus.OK,"successfully deleted");
     }
 
-    public GetPostResponse publishPost(Integer id) {
+    public ResponseEntity<ApiResponse<GetPostResponse>> publishPost(Integer id) {
         Post post = postRepository.findById(id).orElseThrow(() -> new ApiException("post not found", HttpStatus.NOT_FOUND));
         post.setPublished(true);
         post.setPublishedAt(Instant.now().getEpochSecond());
         post =  postRepository.save(post);
-        return postMapper.mapToGetPost(post);
+        GetPostResponse response = postMapper.mapToGetPost(post);
+        return ResponseHelper.response(response,HttpStatus.OK,"successfully published");
     }
 }

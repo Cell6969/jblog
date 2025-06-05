@@ -2,12 +2,14 @@ package com.fcidn.blog.controller;
 
 
 import com.fcidn.blog.entity.Comment;
+import com.fcidn.blog.helper.ApiResponse;
 import com.fcidn.blog.request.CreateCommentRequest;
 import com.fcidn.blog.response.CreateCommentResponse;
 import com.fcidn.blog.response.GetCommentResponse;
 import com.fcidn.blog.service.CommentService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,7 +19,7 @@ public class CommentController {
     CommentService commentService;
 
     @GetMapping("")
-    public Iterable<GetCommentResponse> getComments(
+    public ResponseEntity<ApiResponse<Iterable<GetCommentResponse>>> getComments(
             @RequestParam(required = false) String postSlug,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer limit
@@ -28,12 +30,12 @@ public class CommentController {
     }
 
     @GetMapping("/{id}")
-    public GetCommentResponse getComment(@PathVariable Integer id) {
+    public ResponseEntity<ApiResponse<GetCommentResponse>> getComment(@PathVariable Integer id) {
         return commentService.getComment(id);
     }
 
     @PostMapping("")
-    public CreateCommentResponse createComment(@Valid  @RequestBody CreateCommentRequest comment) {
+    public ResponseEntity<ApiResponse<CreateCommentResponse>> createComment(@Valid  @RequestBody CreateCommentRequest comment) {
         return commentService.createComment(comment);
     }
 }

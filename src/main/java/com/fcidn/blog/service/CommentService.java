@@ -3,6 +3,8 @@ package com.fcidn.blog.service;
 import com.fcidn.blog.entity.Comment;
 import com.fcidn.blog.entity.Post;
 import com.fcidn.blog.exception.ApiException;
+import com.fcidn.blog.helper.ApiResponse;
+import com.fcidn.blog.helper.ResponseHelper;
 import com.fcidn.blog.mapper.CommentMapper;
 import com.fcidn.blog.repository.CommentRepository;
 import com.fcidn.blog.repository.PostRepository;
@@ -12,6 +14,7 @@ import com.fcidn.blog.response.GetCommentResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,29 +30,28 @@ public class CommentService {
     @Autowired
     CommentMapper commentMapper;
 
-    public Iterable<GetCommentResponse> getComments(String postSlug, Integer page, Integer limit) {
-        Post post = postRepository.findFirstBySlugAndIsDeleted(postSlug, false).orElse(null);
-        if (post == null) {
-            return null;
-        }
+    public ResponseEntity<ApiResponse<Iterable<GetCommentResponse>>> getComments(String postSlug, Integer page, Integer limit) {
+        Post post = postRepository
+                .findFirstBySlugAndIsDeleted(postSlug, false)
+                .orElseThrow(() -> new ApiException("post not found", HttpStatus.NOT_FOUND));
 
         PageRequest pageRequest = PageRequest.of(page, limit);
         List<Comment> comments =  commentRepository.findByPostId(post.getId(), pageRequest).getContent();
-        return commentMapper.mapToGetListComment(comments);
+        Iterable<GetCommentResponse> response =  commentMapper.mapToGetListComment(comments);
+        return ResponseHelper.response(response, HttpStatus.OK, "Successfully get list comment");
     }
 
-    public GetCommentResponse getComment(Integer id) {
+    public ResponseEntity<ApiResponse<GetCommentResponse>> getComment(Integer id) {
         Comment comment =  commentRepository.findById(id).orElseThrow(() -> new ApiException("comment not found", HttpStatus.NOT_FOUND));
-        return commentMapper.mapToGetComment(comment);
+        GetCommentResponse response = commentMapper.mapToGetComment(comment);
+        return ResponseHelper.response(response, HttpStatus.OK, "Successfully get comment");
     }
 
     @Transactional
-    public CreateCommentResponse createComment(CreateCommentRequest request) {
-        Post post = postRepository.findFirstBySlugAndIsDeleted(request.getPost().getSlug(), false).orElse(null);
-        if (post == null) {
-            return null;
-        }
-
+    public ResponseEntity<ApiResponse<CreateCommentResponse>> createComment(CreateCommentRequest request) {
+        Post post = postRepository
+                .findFirstBySlugAndIsDeleted(request.getPost().getSlug(), false)
+                .orElseThrow(() -> new ApiException("post not found", HttpStatus.NOT_FOUND));
         Comment comment = commentMapper.mapToCreateComment(request);
 
         // save comment
@@ -60,6 +62,8 @@ public class CommentService {
         // update comment count
         post.setCommentCount(post.getCommentCount() + 1);
         postRepository.save(post);
-        return commentMapper.mapToCreateComment(comment);
+
+        CreateCommentResponse response = commentMapper.mapToCreateComment(comment);
+        return ResponseHelper.response(response, HttpStatus.OK, "Successfully create comment");
     }
 }
