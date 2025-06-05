@@ -2,27 +2,37 @@ package com.fcidn.blog.mapper;
 
 import com.fcidn.blog.entity.Post;
 import com.fcidn.blog.request.CreatePostRequest;
+import com.fcidn.blog.request.UpdatePostRequest;
 import com.fcidn.blog.response.CreatePostResponse;
-import com.fcidn.blog.response.GetPostBySlugResponse;
+import com.fcidn.blog.response.GetPostResponse;
+import com.fcidn.blog.response.UpdatePostResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
+import org.mapstruct.MappingTarget;
 
-@Mapper
+import java.util.List;
+
+@Mapper(componentModel = "spring")
 public interface PostMapper {
-    PostMapper INSTANCE = Mappers.getMapper(PostMapper.class);
-
     Post mapToCreatePost (CreatePostRequest postRequest);
 
-    @Mapping(source = "slug", target = "path")
     @Mapping(source = "createdAt", target = "created_at")
     @Mapping(source = "publishedAt", target = "published_at")
     @Mapping(source = "commentCount", target = "comment_count")
     CreatePostResponse mapToCreatePost(Post post);
 
-    @Mapping(source = "slug", target = "path")
+    @Mapping(source = "createdAt", target = "created_at")
+    @Mapping(source = "publishedAt", target = "published_at")
+    @Mapping(source = "published", target = "is_published")
+    @Mapping(source = "commentCount", target = "comment_count")
+    GetPostResponse mapToGetPost(Post post);
+
+    List<GetPostResponse> mapToListPost(List<Post> posts);
+
+    void updatePost(UpdatePostRequest request, @MappingTarget Post post);
+
     @Mapping(source = "createdAt", target = "created_at")
     @Mapping(source = "publishedAt", target = "published_at")
     @Mapping(source = "commentCount", target = "comment_count")
-    GetPostBySlugResponse mapToGetPostBySlug(Post post);
+    UpdatePostResponse mapToUpdatePost(Post post);
 }

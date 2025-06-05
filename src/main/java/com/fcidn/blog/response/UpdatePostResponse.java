@@ -9,11 +9,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetPostBySlugResponse {
-    private Integer id;
+public class UpdatePostResponse {
     private String title;
     private String body;
-    private String path;
+    private String slug;
     private Long created_at;
     private Long published_at;
     private Long comment_count;

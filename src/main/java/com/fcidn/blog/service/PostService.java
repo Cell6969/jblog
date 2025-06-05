@@ -6,15 +6,19 @@ import com.fcidn.blog.mapper.PostMapper;
 import com.fcidn.blog.repository.PostRepository;
 import com.fcidn.blog.request.CreatePostRequest;
 import com.fcidn.blog.request.GetPostBySlugRequest;
+import com.fcidn.blog.request.UpdatePostRequest;
 import com.fcidn.blog.response.CreatePostResponse;
-import com.fcidn.blog.response.GetPostBySlugResponse;
+import com.fcidn.blog.response.GetPostResponse;
+import com.fcidn.blog.response.UpdatePostResponse;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -22,59 +26,50 @@ import java.time.Instant;
 public class PostService {
     @Autowired
     PostRepository postRepository;
+    @Autowired
+    PostMapper postMapper;
 
-    public Iterable<Post> getPosts() {
-        return postRepository.findAllByIsDeleted(false);
+    public Iterable<GetPostResponse> getPosts(Integer page, Integer limit) {
+        PageRequest pageRequest = PageRequest.of(page, limit);
+        List<Post> posts = postRepository.findAllByIsDeleted(false, pageRequest).getContent();
+        return postMapper.mapToListPost(posts);
     }
 
-    public GetPostBySlugResponse getPostBySlug(GetPostBySlugRequest request) {
+    public GetPostResponse getPostBySlug(GetPostBySlugRequest request) {
         Post post =  postRepository.findFirstBySlugAndIsDeleted(request.getSlug(), false)
                 .orElseThrow(() -> new ApiException("not found", HttpStatus.NOT_FOUND));
-        if (post == null) {
-            return null;
-        }
-        return PostMapper.INSTANCE.mapToGetPostBySlug(post);
+        return postMapper.mapToGetPost(post);
     }
 
     public CreatePostResponse createPost(CreatePostRequest createPostRequest) {
-        Post post = PostMapper.INSTANCE.mapToCreatePost(createPostRequest);
+        Post post = postMapper.mapToCreatePost(createPostRequest);
         post.setCommentCount(0L);
         post.setCreatedAt(Instant.now().getEpochSecond());
         post = postRepository.save(post);
-        return PostMapper.INSTANCE.mapToCreatePost(post);
+        return postMapper.mapToCreatePost(post);
     }
 
-    // TODO: refactor code & change to slug
-    public Post updatePostById(Integer id, Post updatedPost) {
-        Post post = postRepository.findFirstByIdAndIsDeleted(id, false).orElse(null);
-        if (post == null) {
-            return null;
-        }
-
-        updatedPost.setId(post.getId());
-        updatedPost.setCreatedAt(post.getCreatedAt());
-        return postRepository.save(updatedPost);
+    public UpdatePostResponse updatePostById(Integer id, UpdatePostRequest request) {
+        Post post = postRepository
+                .findFirstByIdAndIsDeleted(id, false)
+                .orElseThrow(() -> new ApiException("post not found", HttpStatus.NOT_FOUND));
+        postMapper.updatePost(request, post);
+        Post updatedPost = postRepository.save(post);
+        return postMapper.mapToUpdatePost(updatedPost);
     }
 
     public Boolean deletePostById(Integer id) {
-        Post post = postRepository.findById(id).orElse(null);
-        if (post == null) {
-            return false;
-        }
+        Post post = postRepository.findById(id).orElseThrow(() -> new ApiException("post not found", HttpStatus.NOT_FOUND));
         post.setDeleted(true);
         postRepository.save(post);
         return true;
     }
 
-    // TODO: change to slug
-    public Post publishPost(Integer id) {
-        Post post = postRepository.findFirstByIdAndIsDeleted(id, false).orElse(null);
-        if (post == null) {
-            return null;
-        }
-
+    public GetPostResponse publishPost(Integer id) {
+        Post post = postRepository.findById(id).orElseThrow(() -> new ApiException("post not found", HttpStatus.NOT_FOUND));
         post.setPublished(true);
         post.setPublishedAt(Instant.now().getEpochSecond());
-        return postRepository.save(post);
+        post =  postRepository.save(post);
+        return postMapper.mapToGetPost(post);
     }
 }
