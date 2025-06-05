@@ -1,6 +1,7 @@
 package com.fcidn.blog.service;
 
 import com.fcidn.blog.entity.Post;
+import com.fcidn.blog.exception.ApiException;
 import com.fcidn.blog.mapper.PostMapper;
 import com.fcidn.blog.repository.PostRepository;
 import com.fcidn.blog.request.CreatePostRequest;
@@ -10,6 +11,7 @@ import com.fcidn.blog.response.GetPostBySlugResponse;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -26,7 +28,8 @@ public class PostService {
     }
 
     public GetPostBySlugResponse getPostBySlug(GetPostBySlugRequest request) {
-        Post post =  postRepository.findFirstBySlugAndIsDeleted(request.getSlug(), false).orElse(null);
+        Post post =  postRepository.findFirstBySlugAndIsDeleted(request.getSlug(), false)
+                .orElseThrow(() -> new ApiException("not found", HttpStatus.NOT_FOUND));
         if (post == null) {
             return null;
         }
