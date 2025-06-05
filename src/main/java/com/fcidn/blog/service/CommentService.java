@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 
 @Service
 public class CommentService {
@@ -23,20 +24,23 @@ public class CommentService {
     CommentRepository commentRepository;
     @Autowired
     PostRepository postRepository;
+    @Autowired
+    CommentMapper commentMapper;
 
-    public Iterable<Comment> getComments(String postSlug, Integer page, Integer limit) {
+    public Iterable<GetCommentResponse> getComments(String postSlug, Integer page, Integer limit) {
         Post post = postRepository.findFirstBySlugAndIsDeleted(postSlug, false).orElse(null);
         if (post == null) {
             return null;
         }
 
         PageRequest pageRequest = PageRequest.of(page, limit);
-        return commentRepository.findByPostId(post.getId(), pageRequest).getContent();
+        List<Comment> comments =  commentRepository.findByPostId(post.getId(), pageRequest).getContent();
+        return commentMapper.mapToGetListComment(comments);
     }
 
     public GetCommentResponse getComment(Integer id) {
         Comment comment =  commentRepository.findById(id).orElseThrow(() -> new ApiException("comment not found", HttpStatus.NOT_FOUND));
-        return CommentMapper.INSTANCE.mapToGetComment(comment);
+        return commentMapper.mapToGetComment(comment);
     }
 
     @Transactional
@@ -46,7 +50,7 @@ public class CommentService {
             return null;
         }
 
-        Comment comment = CommentMapper.INSTANCE.mapToCreateComment(request);
+        Comment comment = commentMapper.mapToCreateComment(request);
 
         // save comment
         comment.setCreatedAt(Instant.now().getEpochSecond());
@@ -56,6 +60,6 @@ public class CommentService {
         // update comment count
         post.setCommentCount(post.getCommentCount() + 1);
         postRepository.save(post);
-        return CommentMapper.INSTANCE.mapToCreateComment(comment);
+        return commentMapper.mapToCreateComment(comment);
     }
 }

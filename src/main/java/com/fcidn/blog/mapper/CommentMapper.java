@@ -6,18 +6,19 @@ import com.fcidn.blog.response.CreateCommentResponse;
 import com.fcidn.blog.response.GetCommentResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
-@Mapper
+import java.util.List;
+
+@Mapper(componentModel = "spring")
 public interface CommentMapper {
-    CommentMapper INSTANCE = Mappers.getMapper(CommentMapper.class);
-
     Comment mapToCreateComment(CreateCommentRequest commentRequest);
 
     @Mapping(source = "createdAt", target = "created_at")
     CreateCommentResponse mapToCreateComment(Comment comment);
 
-    @Mapping(target = "post", ignore = true)
+    @Mapping(source = "post.id", target = "post_id")
     @Mapping(source = "createdAt", target = "created_at")
     GetCommentResponse mapToGetComment(Comment comment);
+
+    List<GetCommentResponse> mapToGetListComment(List<Comment> comments);
 }
