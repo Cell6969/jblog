@@ -1,9 +1,9 @@
 package com.fcidn.blog.mapper;
 
 import com.fcidn.blog.entity.Comment;
-import com.fcidn.blog.request.CreateCommentRequest;
-import com.fcidn.blog.response.CreateCommentResponse;
-import com.fcidn.blog.response.GetCommentResponse;
+import com.fcidn.blog.request.comment.CreateCommentRequest;
+import com.fcidn.blog.response.comment.CreateCommentResponse;
+import com.fcidn.blog.response.comment.GetCommentResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

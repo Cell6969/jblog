@@ -1,4 +1,4 @@
-package com.fcidn.blog.response;
+package com.fcidn.blog.response.post;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

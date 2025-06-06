@@ -1,11 +1,11 @@
 package com.fcidn.blog.mapper;
 
 import com.fcidn.blog.entity.Post;
-import com.fcidn.blog.request.CreatePostRequest;
-import com.fcidn.blog.request.UpdatePostRequest;
-import com.fcidn.blog.response.CreatePostResponse;
-import com.fcidn.blog.response.GetPostResponse;
-import com.fcidn.blog.response.UpdatePostResponse;
+import com.fcidn.blog.request.post.CreatePostRequest;
+import com.fcidn.blog.request.post.UpdatePostRequest;
+import com.fcidn.blog.response.post.CreatePostResponse;
+import com.fcidn.blog.response.post.GetPostResponse;
+import com.fcidn.blog.response.post.UpdatePostResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

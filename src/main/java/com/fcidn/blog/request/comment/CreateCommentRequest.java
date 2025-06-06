@@ -1,4 +1,4 @@
-package com.fcidn.blog.request;
+package com.fcidn.blog.request.comment;
 
 import com.fcidn.blog.entity.Post;
 import jakarta.validation.constraints.Email;

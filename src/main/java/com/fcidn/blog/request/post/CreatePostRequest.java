@@ -1,4 +1,4 @@
-package com.fcidn.blog.request;
+package com.fcidn.blog.request.post;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

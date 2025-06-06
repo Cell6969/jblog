@@ -1,6 +1,5 @@
-package com.fcidn.blog.response;
+package com.fcidn.blog.response.comment;
 
-import com.fcidn.blog.entity.Post;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
