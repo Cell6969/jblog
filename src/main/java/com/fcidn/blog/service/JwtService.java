@@ -1,7 +1,9 @@
 package com.fcidn.blog.service;
 
+import com.fcidn.blog.config.PropertiesConfig;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +16,12 @@ import java.util.Map;
 
 @Service
 public class JwtService {
+    @Autowired
+    PropertiesConfig propertiesConfig;
+
     public String generateToken(UserDetails userDetails) {
         Map<String, String> claims = new HashMap<>();
-        claims.put("iss", "https://blogs.fcidn.com");
+        claims.put("iss", propertiesConfig.getJwtIss());
         Instant now = Instant.now();
         return Jwts.builder()
                 .claims(claims)
@@ -28,7 +33,7 @@ public class JwtService {
     }
 
     private SecretKey generateKey() {
-        byte[] decodedKey = Base64.getDecoder().decode("uoMqbAzhyZjy2O2XkyI6mQUeouRPxwA2Xr7emcFj3EeryGe1");
+        byte[] decodedKey = Base64.getDecoder().decode(propertiesConfig.getJwtSecretKey());
         return Keys.hmacShaKeyFor(decodedKey);
     }
 }

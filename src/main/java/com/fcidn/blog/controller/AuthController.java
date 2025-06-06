@@ -5,7 +5,6 @@ import com.fcidn.blog.helper.ResponseHelper;
 import com.fcidn.blog.request.auth.LoginRequest;
 import com.fcidn.blog.response.auth.LoginResponse;
 import com.fcidn.blog.service.JwtService;
-import com.fcidn.blog.service.MyUserDetailService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,9 +26,6 @@ public class AuthController {
     @Autowired
     AuthenticationManager authenticationManager;
 
-    @Autowired
-    MyUserDetailService myUserDetailService;
-
     @PostMapping("/api/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
         Authentication authentication = authenticationManager.authenticate(
@@ -36,7 +33,8 @@ public class AuthController {
         );
 
         if (authentication.isAuthenticated()) {
-            String token = jwtService.generateToken(myUserDetailService.loadUserByUsername(request.getUsername()));
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            String token = jwtService.generateToken(userDetails);
             LoginResponse response = LoginResponse.builder()
                     .token(token)
                     .build();
