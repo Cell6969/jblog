@@ -4,7 +4,7 @@ import com.fcidn.blog.helper.ApiResponse;
 import com.fcidn.blog.helper.ResponseHelper;
 import com.fcidn.blog.request.auth.LoginRequest;
 import com.fcidn.blog.response.auth.LoginResponse;
-import com.fcidn.blog.service.JwtService;
+import com.fcidn.blog.jwt.JwtService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
