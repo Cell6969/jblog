@@ -8,5 +8,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CommentRepository extends CrudRepository<Comment,Integer> {
+    Page<Comment> findAll(Pageable pageable);
     Page<Comment> findByPostId(Integer postId, Pageable pageable);
 }

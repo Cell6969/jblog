@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CommentService {
@@ -31,12 +32,19 @@ public class CommentService {
     CommentMapper commentMapper;
 
     public ResponseEntity<ApiResponse<Iterable<GetCommentResponse>>> getComments(String postSlug, Integer page, Integer limit) {
-        Post post = postRepository
-                .findFirstBySlugAndIsDeleted(postSlug, false)
-                .orElseThrow(() -> new ApiException("post not found", HttpStatus.NOT_FOUND));
-
         PageRequest pageRequest = PageRequest.of(page, limit);
-        List<Comment> comments =  commentRepository.findByPostId(post.getId(), pageRequest).getContent();
+
+        List<Comment> comments;
+
+        if (!postSlug.equals("all")) {
+            Post post = postRepository
+                    .findFirstBySlugAndIsDeleted(postSlug, false)
+                    .orElseThrow(() -> new ApiException("post not found", HttpStatus.NOT_FOUND));
+            comments = commentRepository.findByPostId(post.getId(), pageRequest).getContent();
+        } else {
+            comments = commentRepository.findAll(pageRequest).getContent();
+        }
+
         Iterable<GetCommentResponse> response =  commentMapper.mapToGetListComment(comments);
         return ResponseHelper.response(response, HttpStatus.OK, "Successfully get list comment");
     }

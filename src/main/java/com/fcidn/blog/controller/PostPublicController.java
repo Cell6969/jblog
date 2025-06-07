@@ -14,8 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/posts")
-public class PostController {
+@RequestMapping("/api/public/posts")
+public class PostPublicController {
     @Autowired
     PostService postService;
 
@@ -24,32 +24,14 @@ public class PostController {
             @RequestParam(required = false, defaultValue = "1") Integer page,
             @RequestParam(required = false, defaultValue = "10") Integer limit
     ) {
+        // TODO: only published post
         page = page < 0 ? 0 : --page;
         return postService.getPosts(page, limit);
     }
 
     @GetMapping("/{slug}")
     public ResponseEntity<ApiResponse<GetPostResponse>> getPostBySlug(@Valid @PathVariable GetPostBySlugRequest slug) {
+        // TODO: only published post
         return postService.getPostBySlug(slug);
-    }
-
-    @PostMapping("")
-    public ResponseEntity<ApiResponse<CreatePostResponse>> createPost(@Valid  @RequestBody CreatePostRequest createPostRequest) {
-        return postService.createPost(createPostRequest);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<UpdatePostResponse>> updatePost(@PathVariable Integer id, @RequestBody @Valid UpdatePostRequest request) {
-        return postService.updatePostById(id, request);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Boolean>> deletePost(@PathVariable Integer id) {
-        return postService.deletePostById(id);
-    }
-
-    @PostMapping("/{id}/publish")
-    public ResponseEntity<ApiResponse<GetPostResponse>> publishPost(@PathVariable Integer id) {
-        return postService.publishPost(id);
     }
 }

@@ -32,8 +32,10 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         registry ->
-                                registry.requestMatchers("/api/login").permitAll()
-                                .anyRequest().authenticated()
+                                registry
+                                        .requestMatchers("/api/public/**").permitAll()
+                                        .requestMatchers("/api/admin/**").authenticated()
+                                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
 //                .httpBasic(Customizer.withDefaults())

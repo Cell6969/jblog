@@ -11,9 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
-@RequestMapping("/api/comments")
-public class CommentController {
+@RequestMapping("/api/admin/comments")
+public class CommentAdminController {
     @Autowired
     CommentService commentService;
 
@@ -25,6 +27,7 @@ public class CommentController {
     ) {
 
         page = page < 0 ? 0 : --page;
+        postSlug = (postSlug == null || postSlug.isBlank()) ? "all" : postSlug;
         return commentService.getComments(postSlug, page, limit);
     }
 
