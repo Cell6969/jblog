@@ -5,6 +5,7 @@ import com.fcidn.blog.entity.Comment;
 import com.fcidn.blog.entity.Post;
 import com.fcidn.blog.repository.CommentRepository;
 import com.fcidn.blog.repository.PostRepository;
+import com.fcidn.blog.request.comment.CreateCommentRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,7 @@ import java.time.Instant;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -77,7 +79,7 @@ public class CommentAdminControllerTest {
         commentRepository.save(comment);
     }
 
-    private final String token = "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Jsb2dzLmZjaWRuLmNvbSIsInN1YiI6ImFsZG8iLCJpYXQiOjE3NDk0ODcwNDAsImV4cCI6MTc0OTQ4NzY0MH0.XOXqHHA0aQbGdVxGkpn-IXuHk-wIsGmCQOG_Muv0vsQ";
+    private final String token = "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Jsb2dzLmZjaWRuLmNvbSIsInN1YiI6ImFsZG8iLCJpYXQiOjE3NDk0ODgzNDMsImV4cCI6MTc0OTQ4ODk0M30.0fk1dzxiMQmzGVbVfadhxaoWWt-UKOych6f-rW4RZDY";
 
     @Test
     void getComments_shouldReturnEmpty() throws Exception {
@@ -100,5 +102,29 @@ public class CommentAdminControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", hasSize(1)));
+    }
+
+    @Test
+    void createComment_shouldReturnSuccess() throws Exception {
+        Post dummyPost = new Post();
+        dummyPost.setSlug("dummy1");
+
+        CreateCommentRequest request = new CreateCommentRequest();
+        request.setName("test");
+        request.setPost(dummyPost);
+        request.setEmail("test@gmail.com");
+        request.setBody("test body");
+
+        String json = objectMapper.writeValueAsString(request);
+
+        mockMvc.perform(post("/api/admin/comments")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer "+ token)
+                .content(json))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").isNotEmpty())
+                .andExpect(jsonPath("$.data.name").value(request.getName()))
+                .andExpect(jsonPath("$.data.email").value(request.getEmail()))
+                .andExpect(jsonPath("$.data.post.id").value(1));
     }
 }
