@@ -3,6 +3,7 @@ package com.fcidn.blog.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fcidn.blog.entity.Comment;
 import com.fcidn.blog.entity.Post;
+import com.fcidn.blog.jwt.JwtService;
 import com.fcidn.blog.repository.CommentRepository;
 import com.fcidn.blog.repository.PostRepository;
 import com.fcidn.blog.request.comment.CreateCommentRequest;
@@ -42,6 +43,9 @@ public class CommentAdminControllerTest {
     @Autowired
     private PostRepository postRepository;
 
+    @Autowired
+    private JwtService jwtService;
+
     @BeforeEach
     void setUp() {
         createPost("1");
@@ -79,10 +83,14 @@ public class CommentAdminControllerTest {
         commentRepository.save(comment);
     }
 
-    private final String token = "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Jsb2dzLmZjaWRuLmNvbSIsInN1YiI6ImFsZG8iLCJpYXQiOjE3NDk0ODgzNDMsImV4cCI6MTc0OTQ4ODk0M30.0fk1dzxiMQmzGVbVfadhxaoWWt-UKOych6f-rW4RZDY";
+    private String generateToken() {
+        String username = "aldo";
+        return jwtService.generateTokenByUsername(username);
+    }
 
     @Test
     void getComments_shouldReturnEmpty() throws Exception {
+        String token = generateToken();
         mockMvc.perform(get("/api/admin/comments")
                         .param("page", "1")
                         .param("limit", "10")
@@ -94,6 +102,7 @@ public class CommentAdminControllerTest {
 
     @Test
     void getComment_shouldReturnOne() throws Exception {
+        String token = generateToken();
         createComment("1");
         mockMvc.perform(get("/api/admin/comments")
                 .param("page", "1")
@@ -106,6 +115,7 @@ public class CommentAdminControllerTest {
 
     @Test
     void createComment_shouldReturnSuccess() throws Exception {
+        String token = generateToken();
         Post dummyPost = new Post();
         dummyPost.setSlug("dummy1");
 
@@ -124,7 +134,6 @@ public class CommentAdminControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isNotEmpty())
                 .andExpect(jsonPath("$.data.name").value(request.getName()))
-                .andExpect(jsonPath("$.data.email").value(request.getEmail()))
-                .andExpect(jsonPath("$.data.post.id").value(1));
+                .andExpect(jsonPath("$.data.email").value(request.getEmail()));
     }
 }

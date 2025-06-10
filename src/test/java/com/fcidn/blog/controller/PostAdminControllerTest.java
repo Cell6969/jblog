@@ -2,6 +2,7 @@ package com.fcidn.blog.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fcidn.blog.entity.Post;
+import com.fcidn.blog.jwt.JwtService;
 import com.fcidn.blog.repository.PostRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -34,12 +35,18 @@ public class PostAdminControllerTest {
     @Autowired
     private PostRepository postRepository;
 
+    @Autowired
+    private JwtService jwtService;
+
     @AfterEach
     void cleanUp() {
         postRepository.deleteAll();
     }
 
-    private final String token = "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2Jsb2dzLmZjaWRuLmNvbSIsInN1YiI6ImFsZG8iLCJpYXQiOjE3NDk0ODU2MjMsImV4cCI6MTc0OTQ4NjIyM30.jPZTUBY3VivOlqTG27_0hpyuZlptj0Y4qeD7wp1P_KI";
+    private String generateToken() {
+        String username = "aldo";
+        return jwtService.generateTokenByUsername(username);
+    }
 
     private void createPost(String numPost) {
         String id = String.format("dummy%s", numPost);
@@ -57,6 +64,7 @@ public class PostAdminControllerTest {
 
     @Test
     void getPosts_shouldReturnEmpty() throws Exception{
+        String token = generateToken();
         mockMvc.perform(get("/api/admin/posts")
                         .param("page", "1")
                         .param("limit", "10")
@@ -68,6 +76,7 @@ public class PostAdminControllerTest {
 
     @Test
     void getPosts_shouldReturnOne() throws Exception {
+        String token = generateToken();
         createPost("1");
         mockMvc.perform(get("/api/admin/posts")
                 .param("page", "1")
@@ -80,6 +89,7 @@ public class PostAdminControllerTest {
 
     @Test
     void getPostBySlug_withValidParam_shouldReturnOne() throws Exception {
+        String token = generateToken();
         createPost("1");
         String postParam = "dummy1";
         mockMvc.perform(get(String.format("/api/admin/posts/%s", postParam))
@@ -91,6 +101,7 @@ public class PostAdminControllerTest {
 
     @Test
     void getPostBySlug_withInvalidParams_shouldReturnNotFound() throws Exception {
+        String token = generateToken();
         createPost("1");
         String postParam = "invalid";
         mockMvc.perform(get(String.format("/api/admin/posts/%s", postParam))
