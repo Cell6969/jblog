@@ -21,12 +21,16 @@ public class JwtService {
     PropertiesConfig propertiesConfig;
 
     public String generateToken(UserDetails userDetails) {
+        return generateTokenByUsername(userDetails.getUsername());
+    }
+
+    public String generateTokenByUsername(String username) {
         Map<String, String> claims = new HashMap<>();
         claims.put("iss", propertiesConfig.getJwtIss());
         Instant now = Instant.now();
         return Jwts.builder()
                 .claims(claims)
-                .subject(userDetails.getUsername())
+                .subject(username)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plusSeconds(10*60)))
                 .signWith(generateKey())
