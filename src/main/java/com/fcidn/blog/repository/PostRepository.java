@@ -1,5 +1,6 @@
 package com.fcidn.blog.repository;
 
+import com.fcidn.blog.entity.Category;
 import com.fcidn.blog.entity.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,4 +15,6 @@ public interface PostRepository extends CrudRepository<Post, Integer> {
     Optional<Post> findFirstBySlugAndIsDeleted(String slug, boolean isDeleted);
     Optional<Post> findFirstByIdAndIsDeleted(Integer id, boolean isDeleted);
     Page<Post> findAllByIsDeleted(boolean isDeleted, Pageable pageable);
+
+    Long countByCategory(Category category);
 }

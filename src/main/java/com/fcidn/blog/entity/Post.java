@@ -26,6 +26,10 @@ public class Post {
     private List<Comment> comments ;
     private Long commentCount;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
+
     private long createdAt;
     private long publishedAt;
 }
