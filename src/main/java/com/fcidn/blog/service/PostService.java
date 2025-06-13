@@ -8,6 +8,7 @@ import com.fcidn.blog.repository.CategoryRepository;
 import com.fcidn.blog.repository.PostRepository;
 import com.fcidn.blog.request.post.CreatePostRequest;
 import com.fcidn.blog.request.post.GetPostBySlugRequest;
+import com.fcidn.blog.request.post.GetPostRequest;
 import com.fcidn.blog.request.post.UpdatePostRequest;
 import com.fcidn.blog.response.post.CreatePostResponse;
 import com.fcidn.blog.response.post.GetPostResponse;
@@ -35,14 +36,14 @@ public class PostService {
     @Autowired
     PostMapper postMapper;
 
-    public Iterable<GetPostResponse> getPosts(Integer page, Integer limit) {
-        PageRequest pageRequest = PageRequest.of(page, limit);
-        List<Post> posts = postRepository.findAllByIsDeleted(false, pageRequest).getContent();
+    public Iterable<GetPostResponse> getPosts(GetPostRequest request, Boolean isPublished, Boolean isDeleted) {
+        PageRequest pageRequest = PageRequest.of(request.getPage(), request.getLimit());
+        List<Post> posts = postRepository.findAllByIsDeletedAndIsPublished(isDeleted, isPublished ,pageRequest).getContent();
         return postMapper.mapToListPost(posts);
     }
 
-    public GetPostResponse getPostBySlug(GetPostBySlugRequest request) {
-        Post post =  postRepository.findFirstBySlugAndIsDeleted(request.getSlug(), false)
+    public GetPostResponse getPostBySlug(GetPostBySlugRequest request, Boolean isDeleted) {
+        Post post =  postRepository.findFirstBySlugAndIsDeleted(request.getSlug(), isDeleted)
                 .orElseThrow(() -> new ApiException("not found", HttpStatus.NOT_FOUND));
         return postMapper.mapToGetPost(post);
     }

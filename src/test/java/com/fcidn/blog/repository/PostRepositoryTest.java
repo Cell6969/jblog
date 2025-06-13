@@ -39,16 +39,16 @@ public class PostRepositoryTest {
     }
 
     @Test
-    void findAllByIsDeleted_givenNoPost_shouldReturnEmpty() {
+    void findAllByIsDeleted_AndIsPublished_givenNoPost_shouldReturnEmpty() {
         PageRequest pageRequest = PageRequest.of(0, 10);
-        List<Post> posts = postRepository.findAllByIsDeleted(true, pageRequest).getContent();
+        List<Post> posts = postRepository.findAllByIsDeletedAndIsPublished(true, null,pageRequest).getContent();
 
         Assertions.assertNotNull(posts);
         Assertions.assertEquals(0, posts.size());
     }
 
     @Test
-    void findAllByIsDeleted_givenPostsOnlyOneNotDeleted_shouldReturnOnlyOne() {
+    void findAllByIsDeleted_givenPostsOnlyOneNotDeleted_AndIsPublished_shouldReturnOnlyOne() {
         Post post1 = createDummyPost("1");
         post1.setDeleted(true);
         postRepository.save(post1);
@@ -58,7 +58,7 @@ public class PostRepositoryTest {
         postRepository.save(post2);
 
         PageRequest pageRequest = PageRequest.of(0, 10);
-        List<Post> posts = postRepository.findAllByIsDeleted(false, pageRequest).getContent();
+        List<Post> posts = postRepository.findAllByIsDeletedAndIsPublished(false, null,pageRequest).getContent();
 
         Assertions.assertNotNull(posts);
         Assertions.assertEquals(1, posts.size());

@@ -1,8 +1,10 @@
 package com.fcidn.blog.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fcidn.blog.entity.Category;
 import com.fcidn.blog.entity.Post;
 import com.fcidn.blog.jwt.JwtService;
+import com.fcidn.blog.repository.CategoryRepository;
 import com.fcidn.blog.repository.PostRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -36,6 +38,9 @@ public class PostAdminControllerTest {
     private PostRepository postRepository;
 
     @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
     private JwtService jwtService;
 
     @AfterEach
@@ -49,17 +54,30 @@ public class PostAdminControllerTest {
     }
 
     private void createPost(String numPost) {
+        Category category = createCategory();
+
         String id = String.format("dummy%s", numPost);
         Post post = new Post();
         post.setTitle(id);
         post.setBody(id);
         post.setBody(id);
+        post.setCategory(category);
         post.setSlug(id);
         post.setCommentCount(0L);
         post.setDeleted(false);
         post.setPublished(false);
         post.setCreatedAt(Instant.now().getEpochSecond());
         postRepository.save(post);
+    }
+
+    private Category createCategory() {
+        Category category = new Category();
+        category.setName("cat_dummy");
+        category.setSlug("cat_dummy");
+        category.setIsDeleted(false);
+        category.setCreatedAt(Instant.now().getEpochSecond());
+        category.setUpdatedAt(0L);
+        return categoryRepository.save(category);
     }
 
     @Test
@@ -102,7 +120,6 @@ public class PostAdminControllerTest {
     @Test
     void getPostBySlug_withInvalidParams_shouldReturnNotFound() throws Exception {
         String token = generateToken();
-        createPost("1");
         String postParam = "invalid";
         mockMvc.perform(get(String.format("/api/admin/posts/%s", postParam))
                         .header("Authorization", "Bearer " + token)

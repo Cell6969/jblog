@@ -1,12 +1,12 @@
 package com.fcidn.blog.service;
 
+import com.fcidn.blog.entity.Category;
 import com.fcidn.blog.entity.Post;
-import com.fcidn.blog.helper.ApiResponse;
 import com.fcidn.blog.mapper.PostMapper;
+import com.fcidn.blog.repository.CategoryRepository;
 import com.fcidn.blog.repository.PostRepository;
 import com.fcidn.blog.request.post.CreatePostRequest;
 import com.fcidn.blog.response.post.CreatePostResponse;
-import com.fcidn.blog.response.post.GetPostResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,9 +18,9 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.ResponseEntity;
 
 import java.time.Instant;
+import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 
@@ -33,6 +33,9 @@ public class PostServiceTest {
 
     @Mock
     PostRepository postRepository;
+
+    @Mock
+    CategoryRepository categoryRepository;
 
     @Autowired
     PostMapper postMapper;
@@ -55,6 +58,17 @@ public class PostServiceTest {
         postRequest.setTitle("dummy");
         postRequest.setSlug("dummy");
         postRequest.setBody("ini body");
+        postRequest.setCategory_name("dummy_category");
+
+
+        Category category = new Category();
+        category.setName("dummy_category");
+        category.setSlug("dummy_category");
+        category.setIsDeleted(false);
+        category.setCreatedAt(Instant.now().getEpochSecond());
+        category.setUpdatedAt(0L);
+        when(categoryRepository.save(Mockito.any(Category.class))).thenReturn(category);
+        when(categoryRepository.findFirstBySlug(category.getSlug())).thenReturn(Optional.of(category));
 
         Post post = postMapper.mapToCreatePost(postRequest);
         post.setCommentCount(0L);
