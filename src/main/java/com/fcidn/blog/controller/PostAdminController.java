@@ -1,6 +1,7 @@
 package com.fcidn.blog.controller;
 
 import com.fcidn.blog.helper.ApiResponse;
+import com.fcidn.blog.helper.ResponseHelper;
 import com.fcidn.blog.request.post.CreatePostRequest;
 import com.fcidn.blog.request.post.GetPostBySlugRequest;
 import com.fcidn.blog.request.post.UpdatePostRequest;
@@ -10,6 +11,7 @@ import com.fcidn.blog.response.post.UpdatePostResponse;
 import com.fcidn.blog.service.PostService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,31 +27,37 @@ public class PostAdminController {
             @RequestParam(required = false, defaultValue = "10") Integer limit
     ) {
         page = page < 0 ? 0 : --page;
-        return postService.getPosts(page, limit);
+        Iterable<GetPostResponse> result = postService.getPosts(page, limit);
+        return ResponseHelper.response(result, HttpStatus.OK, "Successfully get list post");
     }
 
     @GetMapping("/{slug}")
     public ResponseEntity<ApiResponse<GetPostResponse>> getPostBySlug(@Valid @PathVariable GetPostBySlugRequest slug) {
-        return postService.getPostBySlug(slug);
+        GetPostResponse result = postService.getPostBySlug(slug);
+        return ResponseHelper.response(result, HttpStatus.OK, "Successfully get post");
     }
 
     @PostMapping("")
     public ResponseEntity<ApiResponse<CreatePostResponse>> createPost(@Valid  @RequestBody CreatePostRequest createPostRequest) {
-        return postService.createPost(createPostRequest);
+        CreatePostResponse result =  postService.createPost(createPostRequest);
+        return ResponseHelper.response(result, HttpStatus.CREATED, "Successfully create post");
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<UpdatePostResponse>> updatePost(@PathVariable Integer id, @RequestBody @Valid UpdatePostRequest request) {
-        return postService.updatePostById(id, request);
+        UpdatePostResponse result =  postService.updatePostById(id, request);
+        return ResponseHelper.response(result, HttpStatus.OK, "Successfully updated post");
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Boolean>> deletePost(@PathVariable Integer id) {
-        return postService.deletePostById(id);
+        Boolean result =  postService.deletePostById(id);
+        return ResponseHelper.response(result,HttpStatus.OK,"successfully deleted");
     }
 
     @PostMapping("/{id}/publish")
     public ResponseEntity<ApiResponse<GetPostResponse>> publishPost(@PathVariable Integer id) {
-        return postService.publishPost(id);
+        GetPostResponse result =  postService.publishPost(id);
+        return ResponseHelper.response(result,HttpStatus.OK,"successfully published");
     }
 }

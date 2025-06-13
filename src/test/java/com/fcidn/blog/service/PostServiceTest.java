@@ -6,6 +6,7 @@ import com.fcidn.blog.mapper.PostMapper;
 import com.fcidn.blog.repository.PostRepository;
 import com.fcidn.blog.request.post.CreatePostRequest;
 import com.fcidn.blog.response.post.CreatePostResponse;
+import com.fcidn.blog.response.post.GetPostResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -62,16 +63,16 @@ public class PostServiceTest {
         when(postRepository.save(Mockito.any(Post.class))).thenReturn(post);
 
 
-        ResponseEntity<ApiResponse<CreatePostResponse>> postResponse = postService.createPost(postRequest);
+        CreatePostResponse postResponse = postService.createPost(postRequest);
 
-        Assertions.assertNotNull(postResponse.getBody());
-        Assertions.assertEquals(0, postResponse.getBody().getData().getComment_count());
-        Assertions.assertEquals(postResponse.getBody().getData().getSlug(), post.getSlug());
-        Assertions.assertEquals(postResponse.getBody().getData().getTitle(), post.getTitle());
-        Assertions.assertEquals(postResponse.getBody().getData().getComment_count(), post.getCommentCount());
+        Assertions.assertNotNull(postResponse);
+        Assertions.assertEquals(0, postResponse.getComment_count());
+        Assertions.assertEquals(postResponse.getSlug(), post.getSlug());
+        Assertions.assertEquals(postResponse.getTitle(), post.getTitle());
+        Assertions.assertEquals(postResponse.getComment_count(), post.getCommentCount());
 
         long maxSeconds = 3;
-        long diffCreatedAt = Math.abs(postResponse.getBody().getData().getCreated_at() - post.getCreatedAt());
+        long diffCreatedAt = Math.abs(postResponse.getCreated_at() - post.getCreatedAt());
         Assertions.assertTrue(diffCreatedAt < maxSeconds);
 
         verify(postRepository, times(1)).save(Mockito.any(Post.class));

@@ -32,52 +32,47 @@ public class PostService {
     @Autowired
     PostMapper postMapper;
 
-    public ResponseEntity<ApiResponse<Iterable<GetPostResponse>>> getPosts(Integer page, Integer limit) {
+    public Iterable<GetPostResponse> getPosts(Integer page, Integer limit) {
         PageRequest pageRequest = PageRequest.of(page, limit);
         List<Post> posts = postRepository.findAllByIsDeleted(false, pageRequest).getContent();
-        Iterable<GetPostResponse> response = postMapper.mapToListPost(posts);
-        return ResponseHelper.response(response, HttpStatus.OK, "Successfully get list post");
+        return postMapper.mapToListPost(posts);
     }
 
-    public ResponseEntity<ApiResponse<GetPostResponse>> getPostBySlug(GetPostBySlugRequest request) {
+    public GetPostResponse getPostBySlug(GetPostBySlugRequest request) {
         Post post =  postRepository.findFirstBySlugAndIsDeleted(request.getSlug(), false)
                 .orElseThrow(() -> new ApiException("not found", HttpStatus.NOT_FOUND));
-        GetPostResponse response = postMapper.mapToGetPost(post);
-        return ResponseHelper.response(response, HttpStatus.OK, "Successfully get post");
+        return postMapper.mapToGetPost(post);
     }
 
-    public ResponseEntity<ApiResponse<CreatePostResponse>> createPost(CreatePostRequest createPostRequest) {
+    public CreatePostResponse createPost(CreatePostRequest createPostRequest) {
         Post post = postMapper.mapToCreatePost(createPostRequest);
         post.setCommentCount(0L);
         post.setCreatedAt(Instant.now().getEpochSecond());
         post = postRepository.save(post);
-        CreatePostResponse response =  postMapper.mapToCreatePost(post);
-        return ResponseHelper.response(response, HttpStatus.CREATED, "Successfully create post");
+        return postMapper.mapToCreatePost(post);
     }
 
-    public ResponseEntity<ApiResponse<UpdatePostResponse>> updatePostById(Integer id, UpdatePostRequest request) {
+    public UpdatePostResponse updatePostById(Integer id, UpdatePostRequest request) {
         Post post = postRepository
                 .findFirstByIdAndIsDeleted(id, false)
                 .orElseThrow(() -> new ApiException("post not found", HttpStatus.NOT_FOUND));
         postMapper.updatePost(request, post);
         Post updatedPost = postRepository.save(post);
-        UpdatePostResponse response =  postMapper.mapToUpdatePost(updatedPost);
-        return ResponseHelper.response(response, HttpStatus.OK, "Successfully updated post");
+        return postMapper.mapToUpdatePost(updatedPost);
     }
 
-    public ResponseEntity<ApiResponse<Boolean>> deletePostById(Integer id) {
+    public Boolean deletePostById(Integer id) {
         Post post = postRepository.findById(id).orElseThrow(() -> new ApiException("post not found", HttpStatus.NOT_FOUND));
         post.setDeleted(true);
         postRepository.save(post);
-        return ResponseHelper.response(true,HttpStatus.OK,"successfully deleted");
+        return true;
     }
 
-    public ResponseEntity<ApiResponse<GetPostResponse>> publishPost(Integer id) {
+    public GetPostResponse publishPost(Integer id) {
         Post post = postRepository.findById(id).orElseThrow(() -> new ApiException("post not found", HttpStatus.NOT_FOUND));
         post.setPublished(true);
         post.setPublishedAt(Instant.now().getEpochSecond());
         post =  postRepository.save(post);
-        GetPostResponse response = postMapper.mapToGetPost(post);
-        return ResponseHelper.response(response,HttpStatus.OK,"successfully published");
+        return postMapper.mapToGetPost(post);
     }
 }

@@ -1,6 +1,7 @@
 package com.fcidn.blog.controller;
 
 import com.fcidn.blog.helper.ApiResponse;
+import com.fcidn.blog.helper.ResponseHelper;
 import com.fcidn.blog.request.post.CreatePostRequest;
 import com.fcidn.blog.request.post.GetPostBySlugRequest;
 import com.fcidn.blog.request.post.UpdatePostRequest;
@@ -10,6 +11,7 @@ import com.fcidn.blog.response.post.UpdatePostResponse;
 import com.fcidn.blog.service.PostService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,12 +28,14 @@ public class PostPublicController {
     ) {
         // TODO: only published post
         page = page < 0 ? 0 : --page;
-        return postService.getPosts(page, limit);
+        Iterable<GetPostResponse> result = postService.getPosts(page, limit);
+        return ResponseHelper.response(result, HttpStatus.OK, "Successfully get list post");
     }
 
     @GetMapping("/{slug}")
     public ResponseEntity<ApiResponse<GetPostResponse>> getPostBySlug(@Valid @PathVariable GetPostBySlugRequest slug) {
         // TODO: only published post
-        return postService.getPostBySlug(slug);
+        GetPostResponse result = postService.getPostBySlug(slug);
+        return ResponseHelper.response(result, HttpStatus.OK, "Successfully get post");
     }
 }
