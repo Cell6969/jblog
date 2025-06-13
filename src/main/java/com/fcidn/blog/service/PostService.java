@@ -1,10 +1,10 @@
 package com.fcidn.blog.service;
 
+import com.fcidn.blog.entity.Category;
 import com.fcidn.blog.entity.Post;
 import com.fcidn.blog.exception.ApiException;
-import com.fcidn.blog.helper.ApiResponse;
-import com.fcidn.blog.helper.ResponseHelper;
 import com.fcidn.blog.mapper.PostMapper;
+import com.fcidn.blog.repository.CategoryRepository;
 import com.fcidn.blog.repository.PostRepository;
 import com.fcidn.blog.request.post.CreatePostRequest;
 import com.fcidn.blog.request.post.GetPostBySlugRequest;
@@ -17,7 +17,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -29,6 +28,10 @@ import java.util.List;
 public class PostService {
     @Autowired
     PostRepository postRepository;
+
+    @Autowired
+    CategoryRepository categoryRepository;
+
     @Autowired
     PostMapper postMapper;
 
@@ -45,7 +48,11 @@ public class PostService {
     }
 
     public CreatePostResponse createPost(CreatePostRequest createPostRequest) {
+        String categorySlug = createPostRequest.getCategory_name().toLowerCase();
+        Category category = categoryRepository.findFirstBySlug(categorySlug)
+                .orElseThrow(() -> new ApiException("category not found", HttpStatus.NOT_FOUND));
         Post post = postMapper.mapToCreatePost(createPostRequest);
+        post.setCategory(category);
         post.setCommentCount(0L);
         post.setCreatedAt(Instant.now().getEpochSecond());
         post = postRepository.save(post);

@@ -23,4 +23,8 @@ public class CreatePostRequest {
     @Size(min = 3, message = "minimal 3 karakter")
     @NotNull
     private String slug;
+
+    @Size(min = 3)
+    @NotNull
+    private String category_name;
 }

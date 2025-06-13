@@ -14,6 +14,7 @@ public class GetPostResponse {
     private String title;
     private String body;
     private String slug;
+    private String category;
     private boolean is_published;
     private Long created_at;
     private Long published_at;

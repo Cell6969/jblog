@@ -16,11 +16,13 @@ import java.util.List;
 public interface PostMapper {
     Post mapToCreatePost (CreatePostRequest postRequest);
 
+    @Mapping(source = "category.name", target = "category")
     @Mapping(source = "createdAt", target = "created_at")
     @Mapping(source = "publishedAt", target = "published_at")
     @Mapping(source = "commentCount", target = "comment_count")
     CreatePostResponse mapToCreatePost(Post post);
 
+    @Mapping(source = "category.name", target = "category")
     @Mapping(source = "createdAt", target = "created_at")
     @Mapping(source = "publishedAt", target = "published_at")
     @Mapping(source = "published", target = "is_published")
@@ -31,6 +33,7 @@ public interface PostMapper {
 
     void updatePost(UpdatePostRequest request, @MappingTarget Post post);
 
+    @Mapping(source = "category.name", target = "category")
     @Mapping(source = "createdAt", target = "created_at")
     @Mapping(source = "publishedAt", target = "published_at")
     @Mapping(source = "commentCount", target = "comment_count")
