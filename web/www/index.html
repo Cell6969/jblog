@@ -78,7 +78,7 @@
             meta.innerHTML = `
                 <p>
                     <strong>${post.category}</strong> |
-                    ${new Date(post.published_at*100).toLocaleDateString()} |
+                    ${new Date(post.published_at*1000).toLocaleDateString()} |
                     ${post.comment_count} Comment(s)
                 </p>
             `
