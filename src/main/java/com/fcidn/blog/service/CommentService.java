@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CommentService {
@@ -44,7 +43,6 @@ public class CommentService {
         } else {
             comments = commentRepository.findAll(pageRequest).getContent();
         }
-
         Iterable<GetCommentResponse> response =  commentMapper.mapToGetListComment(comments);
         return ResponseHelper.response(response, HttpStatus.OK, "Successfully get list comment");
     }

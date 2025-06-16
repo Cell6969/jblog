@@ -13,6 +13,7 @@ public class GetCommentResponse {
     private Integer id;
     private String name;
     private String email;
+    private String body;
     private Integer post_id;
     private Long created_at;
 }

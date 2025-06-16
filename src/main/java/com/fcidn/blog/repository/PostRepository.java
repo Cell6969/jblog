@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface PostRepository extends CrudRepository<Post, Integer> {
     Optional<Post> findBySlug(String slug);
 
-    @Query("SELECT p FROM Post p WHERE (:isDeleted IS NULL or p.isDeleted = :isDeleted)")
+    @Query(value = "SELECT * FROM posts WHERE slug = :slug AND (:isDeleted IS NULL OR is_deleted = :isDeleted) LIMIT 1", nativeQuery = true)
     Optional<Post> findFirstBySlugAndIsDeleted(String slug, Boolean isDeleted);
     Optional<Post> findFirstByIdAndIsDeleted(Integer id, boolean isDeleted);
 

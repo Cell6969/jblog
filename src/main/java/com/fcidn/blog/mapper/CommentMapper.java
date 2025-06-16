@@ -18,6 +18,7 @@ public interface CommentMapper {
 
     @Mapping(source = "post.id", target = "post_id")
     @Mapping(source = "createdAt", target = "created_at")
+    @Mapping(source = "body", target = "body")
     GetCommentResponse mapToGetComment(Comment comment);
 
     List<GetCommentResponse> mapToGetListComment(List<Comment> comments);

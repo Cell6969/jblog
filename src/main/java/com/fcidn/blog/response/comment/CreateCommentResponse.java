@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 public class CreateCommentResponse {
     private String name;
     private String email;
+    private String body;
     private Post post;
     private Long created_at;
 }
