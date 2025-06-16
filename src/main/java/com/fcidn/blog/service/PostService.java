@@ -64,7 +64,11 @@ public class PostService {
         Post post = postRepository
                 .findFirstByIdAndIsDeleted(id, false)
                 .orElseThrow(() -> new ApiException("post not found", HttpStatus.NOT_FOUND));
+        String categorySlug = request.getCategory_name().toLowerCase();
+        Category category = categoryRepository.findFirstBySlug(categorySlug)
+                .orElseThrow(() -> new ApiException("category not found", HttpStatus.NOT_FOUND));
         postMapper.updatePost(request, post);
+        post.setCategory(category);
         Post updatedPost = postRepository.save(post);
         return postMapper.mapToUpdatePost(updatedPost);
     }
