@@ -26,9 +26,13 @@ public class SecurityConfig {
     @Autowired
     JwtAuthFilter jwtAuthFilter;
 
+    @Autowired
+    CorsFilter corsFilter;
+
     @Bean
     public SecurityFilterChain mySFC(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
+                .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsFilter))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         registry ->
