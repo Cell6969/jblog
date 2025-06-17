@@ -15,5 +15,6 @@ public class GetCommentResponse {
     private String email;
     private String body;
     private Integer post_id;
+    private String post_title;
     private Long created_at;
 }

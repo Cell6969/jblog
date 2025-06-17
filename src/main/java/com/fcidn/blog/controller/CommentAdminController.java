@@ -20,8 +20,8 @@ public class CommentAdminController {
     @GetMapping("")
     public ResponseEntity<ApiResponse<Iterable<GetCommentResponse>>> getComments(
             @RequestParam(required = false) String postSlug,
-            @RequestParam(required = false) Integer page,
-            @RequestParam(required = false) Integer limit
+            @RequestParam(required = false, defaultValue = "1") Integer page,
+            @RequestParam(required = false, defaultValue = "10") Integer limit
     ) {
 
         page = page < 0 ? 0 : --page;

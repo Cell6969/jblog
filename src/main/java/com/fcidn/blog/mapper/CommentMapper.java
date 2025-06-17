@@ -17,6 +17,7 @@ public interface CommentMapper {
     CreateCommentResponse mapToCreateComment(Comment comment);
 
     @Mapping(source = "post.id", target = "post_id")
+    @Mapping(source = "post.title", target = "post_title")
     @Mapping(source = "createdAt", target = "created_at")
     @Mapping(source = "body", target = "body")
     GetCommentResponse mapToGetComment(Comment comment);
