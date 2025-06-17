@@ -12,6 +12,8 @@ import com.fcidn.blog.request.comment.CreateCommentRequest;
 import com.fcidn.blog.response.comment.CreateCommentResponse;
 import com.fcidn.blog.response.comment.GetCommentResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +32,7 @@ public class CommentService {
     @Autowired
     CommentMapper commentMapper;
 
+    @Cacheable(value = "CommentService.getComments", key = "{#postSlug, #page, #limit}")
     public ResponseEntity<ApiResponse<Iterable<GetCommentResponse>>> getComments(String postSlug, Integer page, Integer limit) {
         PageRequest pageRequest = PageRequest.of(page, limit);
 
@@ -53,6 +56,7 @@ public class CommentService {
         return ResponseHelper.response(response, HttpStatus.OK, "Successfully get comment");
     }
 
+    @CacheEvict(value = "CommentService.getComments", allEntries = true)
     @Transactional
     public ResponseEntity<ApiResponse<CreateCommentResponse>> createComment(CreateCommentRequest request) {
         Post post = postRepository
