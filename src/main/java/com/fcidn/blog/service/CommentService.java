@@ -33,7 +33,7 @@ public class CommentService {
     CommentMapper commentMapper;
 
     @Cacheable(value = "CommentService.getComments", key = "{#postSlug, #page, #limit}")
-    public ResponseEntity<ApiResponse<Iterable<GetCommentResponse>>> getComments(String postSlug, Integer page, Integer limit) {
+    public Iterable<GetCommentResponse> getComments(String postSlug, Integer page, Integer limit) {
         PageRequest pageRequest = PageRequest.of(page, limit);
 
         List<Comment> comments;
@@ -46,8 +46,7 @@ public class CommentService {
         } else {
             comments = commentRepository.findAll(pageRequest).getContent();
         }
-        Iterable<GetCommentResponse> response =  commentMapper.mapToGetListComment(comments);
-        return ResponseHelper.response(response, HttpStatus.OK, "Successfully get list comment");
+        return commentMapper.mapToGetListComment(comments);
     }
 
     public ResponseEntity<ApiResponse<GetCommentResponse>> getComment(Integer id) {
@@ -58,7 +57,7 @@ public class CommentService {
 
     @CacheEvict(value = "CommentService.getComments", allEntries = true)
     @Transactional
-    public ResponseEntity<ApiResponse<CreateCommentResponse>> createComment(CreateCommentRequest request) {
+    public CreateCommentResponse createComment(CreateCommentRequest request) {
         Post post = postRepository
                 .findFirstBySlugAndIsDeleted(request.getPost().getSlug(), false)
                 .orElseThrow(() -> new ApiException("post not found", HttpStatus.NOT_FOUND));
@@ -73,7 +72,6 @@ public class CommentService {
         post.setCommentCount(post.getCommentCount() + 1);
         postRepository.save(post);
 
-        CreateCommentResponse response = commentMapper.mapToCreateComment(comment);
-        return ResponseHelper.response(response, HttpStatus.OK, "Successfully create comment");
+        return commentMapper.mapToCreateComment(comment);
     }
 }

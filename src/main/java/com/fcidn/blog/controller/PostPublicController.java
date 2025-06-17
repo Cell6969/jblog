@@ -2,13 +2,9 @@ package com.fcidn.blog.controller;
 
 import com.fcidn.blog.helper.ApiResponse;
 import com.fcidn.blog.helper.ResponseHelper;
-import com.fcidn.blog.request.post.CreatePostRequest;
 import com.fcidn.blog.request.post.GetPostBySlugRequest;
 import com.fcidn.blog.request.post.GetPostRequest;
-import com.fcidn.blog.request.post.UpdatePostRequest;
-import com.fcidn.blog.response.post.CreatePostResponse;
 import com.fcidn.blog.response.post.GetPostResponse;
-import com.fcidn.blog.response.post.UpdatePostResponse;
 import com.fcidn.blog.service.PostService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
